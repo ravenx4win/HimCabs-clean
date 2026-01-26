@@ -1,28 +1,42 @@
-import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-  TouchableOpacity,
-} from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import React, { useEffect } from "react";
+import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 export default function SearchingScreen() {
   const navigation = useNavigation();
+  const route = useRoute();
+
+  const { booking } = route.params || {};
+  const { pickupLocation, dropLocation, vehicleType } = booking || {};
+
+  useEffect(() => {
+    if (!booking) return;
+
+    const timer = setTimeout(() => {
+      const mockDriver = {
+        name: "Rajesh Kumar",
+        vehicleNumber: "HP 01 A 1234",
+        rating: 4.8,
+        phone: "+91 98765 43210",
+      };
+
+      navigation.replace("RideTracking", {
+        booking,
+        driver: mockDriver,
+      });
+    }, 2500);
+
+    return () => clearTimeout(timer);
+  }, [booking]);
 
   return (
     <View style={styles.container}>
       <ActivityIndicator size="large" color="#000" />
-      <Text style={styles.text}>Searching for nearby driver...</Text>
-
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("RideTracking")}
-        activeOpacity={0.8}
-      >
-        <Text style={styles.buttonText}>Continue</Text>
-      </TouchableOpacity>
+      <Text style={styles.title}>Connecting to Drivers...</Text>
+      <Text style={styles.subtitle}>
+        Searching for <Text style={styles.bold}>{vehicleType}</Text> near{" "}
+        <Text style={styles.bold}>{pickupLocation}</Text>
+      </Text>
     </View>
   );
 }
@@ -33,22 +47,18 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     justifyContent: "center",
     alignItems: "center",
+    padding: 20,
   },
-  text: {
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
     marginTop: 20,
+    marginBottom: 10,
+  },
+  subtitle: {
     fontSize: 16,
-    color: "#444",
+    color: "#666",
+    textAlign: "center",
   },
-  button: {
-    marginTop: 40,
-    backgroundColor: "#000",
-    paddingVertical: 12,
-    paddingHorizontal: 26,
-    borderRadius: 10,
-  },
-  buttonText: {
-    color: "#FFF",
-    fontSize: 15,
-    fontWeight: "600",
-  },
+  bold: { fontWeight: "700", color: "#000" },
 });
