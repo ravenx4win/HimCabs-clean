@@ -1,10 +1,20 @@
 import React, { useEffect } from "react";
 import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+import { RootStackParamList } from "../navigation/AppNavigator";
+
+type SearchingRouteProp = RouteProp<RootStackParamList, "Searching">;
+
+type SearchingNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "Searching"
+>;
 
 export default function SearchingScreen() {
-  const navigation = useNavigation();
-  const route = useRoute();
+  const navigation = useNavigation<SearchingNavigationProp>();
+  const route = useRoute<SearchingRouteProp>();
 
   const { booking } = route.params || {};
   const { pickupLocation, dropLocation, vehicleType } = booking || {};
@@ -27,7 +37,7 @@ export default function SearchingScreen() {
     }, 2500);
 
     return () => clearTimeout(timer);
-  }, [booking]);
+  }, [booking, navigation]);
 
   return (
     <View style={styles.container}>

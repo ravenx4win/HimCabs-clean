@@ -6,11 +6,21 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import { useRoute, useNavigation } from "@react-navigation/native";
+import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+import { RootStackParamList } from "../navigation/AppNavigator";
+
+type RideTrackingRouteProp = RouteProp<RootStackParamList, "RideTracking">;
+
+type RideTrackingNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "RideTracking"
+>;
 
 export default function RideTrackingScreen() {
-  const route = useRoute();
-  const navigation = useNavigation();
+  const route = useRoute<RideTrackingRouteProp>();
+  const navigation = useNavigation<RideTrackingNavigationProp>();
 
   const { booking, driver } = route.params || {};
   const { pickupLocation, dropLocation, vehicleType } = booking || {};
@@ -25,11 +35,11 @@ export default function RideTrackingScreen() {
 
       <View style={styles.card}>
         <Text style={styles.sectionTitle}>Driver Details</Text>
-        <Text style={styles.driverName}>{safeDriver.name}</Text>
+        <Text style={styles.driverName}>{safeDriver?.name}</Text>
         <Text style={styles.vehicleInfo}>
-          {vehicleType} • {safeDriver.vehicleNumber}
+          {vehicleType} • {safeDriver?.vehicleNumber}
         </Text>
-        <Text style={styles.rating}>⭐ {safeDriver.rating}</Text>
+        <Text style={styles.rating}>⭐ {safeDriver?.rating}</Text>
       </View>
 
       <View style={styles.card}>
