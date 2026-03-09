@@ -1,0 +1,8 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "allowJs": true,
+    "strict": false,
+    "noEmit": true
+  }
+}
