@@ -10,6 +10,7 @@ import {
   Platform,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { RootStackParamList } from "../navigation/AppNavigator";
@@ -42,16 +43,38 @@ export default function HomeScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
-    >
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.logo}>🚕 HimCabs</Text>
-        <Text style={styles.tagline}>Book bikes & rides easily</Text>
+    <View style={styles.wrapper}>
+      <MapView
+        provider={PROVIDER_GOOGLE}
+        style={StyleSheet.absoluteFillObject}
+        initialRegion={{
+          latitude: 32.2190,
+          longitude: 76.3234,
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05,
+        }}
+        showsUserLocation={true}
+        followsUserLocation={true}
+      >
+        <Marker
+          coordinate={{ latitude: 32.2190, longitude: 76.3234 }}
+          title="Default Location"
+          description="Himachal Pradesh"
+        />
+      </MapView>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Pickup Location</Text>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.container}
+        pointerEvents="box-none"
+      >
+        <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
+          <View style={styles.card}>
+            <Text style={styles.logo}>🚕 HimCabs</Text>
+            <Text style={styles.tagline}>Book bikes & rides easily</Text>
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Pickup Location</Text>
           <TextInput
             style={styles.input}
             placeholder="e.g. Dharamshala Bus Stand"
@@ -107,18 +130,32 @@ export default function HomeScreen() {
 
         <TouchableOpacity style={styles.bookButton} onPress={handleBookRide}>
           <Text style={styles.bookButtonText}>Book a Ride</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </KeyboardAvoidingView>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FFFFFF" },
+  wrapper: { flex: 1 },
+  container: { flex: 1 },
   scrollContainer: {
     flexGrow: 1,
-    justifyContent: "center",
+    justifyContent: "flex-end",
     padding: 20,
+    paddingBottom: 40,
+  },
+  card: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 5,
   },
   logo: {
     fontSize: 32,
