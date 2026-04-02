@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,8 +10,9 @@ import {
   Platform,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, { Marker, UrlTile } from "react-native-maps";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import * as Location from "expo-location";
 
 import { RootStackParamList } from "../navigation/AppNavigator";
 
@@ -26,6 +27,13 @@ export default function HomeScreen() {
   const [pickupLocation, setPickupLocation] = useState("");
   const [dropLocation, setDropLocation] = useState("");
   const [vehicleType, setVehicleType] = useState("Bike");
+
+  // ✅ Request location permission (important for user location)
+  useEffect(() => {
+    (async () => {
+      await Location.requestForegroundPermissionsAsync();
+    })();
+  }, []);
 
   const handleBookRide = () => {
     if (!pickupLocation || !dropLocation) {
@@ -45,8 +53,8 @@ export default function HomeScreen() {
   return (
     <View style={styles.wrapper}>
       <MapView
-        provider={PROVIDER_GOOGLE}
         style={StyleSheet.absoluteFillObject}
+        mapType="none" // ✅ IMPORTANT for OpenStreetMap
         initialRegion={{
           latitude: 32.2190,
           longitude: 76.3234,
@@ -56,6 +64,12 @@ export default function HomeScreen() {
         showsUserLocation={true}
         followsUserLocation={true}
       >
+        <UrlTile
+          urlTemplate="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          maximumZ={19}
+          flipY={false}
+          zIndex={-1} // ✅ ensures tiles stay below markers/UI
+        />
         <Marker
           coordinate={{ latitude: 32.2190, longitude: 76.3234 }}
           title="Default Location"
@@ -68,68 +82,74 @@ export default function HomeScreen() {
         style={styles.container}
         pointerEvents="box-none"
       >
-        <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="handled"
+        >
           <View style={styles.card}>
             <Text style={styles.logo}>🚕 HimCabs</Text>
             <Text style={styles.tagline}>Book bikes & rides easily</Text>
 
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Pickup Location</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="e.g. Dharamshala Bus Stand"
-            value={pickupLocation}
-            onChangeText={setPickupLocation}
-          />
+              <TextInput
+                style={styles.input}
+                placeholder="e.g. Dharamshala Bus Stand"
+                value={pickupLocation}
+                onChangeText={setPickupLocation}
+              />
 
-          <Text style={styles.label}>Drop Location</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="e.g. McLeod Ganj Main Square"
-            value={dropLocation}
-            onChangeText={setDropLocation}
-          />
-        </View>
+              <Text style={styles.label}>Drop Location</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="e.g. McLeod Ganj Main Square"
+                value={dropLocation}
+                onChangeText={setDropLocation}
+              />
+            </View>
 
-        <Text style={styles.label}>Select Vehicle</Text>
-        <View style={styles.vehicleContainer}>
-          <TouchableOpacity
-            style={[
-              styles.vehicleButton,
-              vehicleType === "Bike" && styles.vehicleButtonSelected,
-            ]}
-            onPress={() => setVehicleType("Bike")}
-          >
-            <Text
-              style={[
-                styles.vehicleText,
-                vehicleType === "Bike" && styles.vehicleTextSelected,
-              ]}
+            <Text style={styles.label}>Select Vehicle</Text>
+            <View style={styles.vehicleContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.vehicleButton,
+                  vehicleType === "Bike" && styles.vehicleButtonSelected,
+                ]}
+                onPress={() => setVehicleType("Bike")}
+              >
+                <Text
+                  style={[
+                    styles.vehicleText,
+                    vehicleType === "Bike" && styles.vehicleTextSelected,
+                  ]}
+                >
+                  🏍️ Bike
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.vehicleButton,
+                  vehicleType === "Auto" && styles.vehicleButtonSelected,
+                ]}
+                onPress={() => setVehicleType("Auto")}
+              >
+                <Text
+                  style={[
+                    styles.vehicleText,
+                    vehicleType === "Auto" && styles.vehicleTextSelected,
+                  ]}
+                >
+                  🛺 Auto
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              style={styles.bookButton}
+              onPress={handleBookRide}
             >
-              🏍️ Bike
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.vehicleButton,
-              vehicleType === "Auto" && styles.vehicleButtonSelected,
-            ]}
-            onPress={() => setVehicleType("Auto")}
-          >
-            <Text
-              style={[
-                styles.vehicleText,
-                vehicleType === "Auto" && styles.vehicleTextSelected,
-              ]}
-            >
-              🛺 Auto
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        <TouchableOpacity style={styles.bookButton} onPress={handleBookRide}>
-          <Text style={styles.bookButtonText}>Book a Ride</Text>
+              <Text style={styles.bookButtonText}>Book a Ride</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
