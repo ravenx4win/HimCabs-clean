@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -23,17 +23,82 @@ type HomeScreenNavigationProp = NativeStackNavigationProp<
 
 export default function HomeScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
+  const mapRef = useRef<MapView>(null);
 
   const [pickupLocation, setPickupLocation] = useState("");
   const [dropLocation, setDropLocation] = useState("");
   const [vehicleType, setVehicleType] = useState("Bike");
+  const [userLocation, setUserLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
+  const [showDrivers, setShowDrivers] = useState(false);
 
   // ✅ Request location permission (important for user location)
   useEffect(() => {
     (async () => {
-      await Location.requestForegroundPermissionsAsync();
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") return;
+
+      let location = await Location.getCurrentPositionAsync({});
+      setUserLocation({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
     })();
   }, []);
+
+  const MOCK_DRIVERS = [
+    { id: "1", latitude: 32.221, longitude: 76.325 },
+    { id: "2", latitude: 32.215, longitude: 76.32 },
+    { id: "3", latitude: 32.225, longitude: 76.328 },
+  ];
+
+  const handleMyLocation = () => {
+    if (userLocation && mapRef.current) {
+      mapRef.current.animateToRegion(
+        {
+          latitude: userLocation.latitude,
+          longitude: userLocation.longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        },
+        1000,
+      );
+    } else {
+      alert("Fetching user location... Please ensure permissions are granted.");
+    }
+  };
+
+  const handleShowDrivers = () => {
+    setShowDrivers(true);
+    if (mapRef.current) {
+      mapRef.current.animateToRegion(
+        {
+          latitude: 32.22,
+          longitude: 76.324,
+          latitudeDelta: 0.03,
+          longitudeDelta: 0.03,
+        },
+        1000,
+      );
+    }
+  };
+
+  const handleFullMap = () => {
+    setShowDrivers(false);
+    if (mapRef.current) {
+      mapRef.current.animateToRegion(
+        {
+          latitude: 32.219,
+          longitude: 76.3234,
+          latitudeDelta: 0.2,
+          longitudeDelta: 0.2,
+        },
+        1000,
+      );
+    }
+  };
 
   const handleBookRide = () => {
     if (!pickupLocation || !dropLocation) {
@@ -53,6 +118,7 @@ export default function HomeScreen() {
   return (
     <View style={styles.wrapper}>
       <MapView
+        ref={mapRef}
         style={StyleSheet.absoluteFillObject}
         mapType="standard" // ✅ FIXED (was "none")
         initialRegion={{
@@ -74,7 +140,37 @@ export default function HomeScreen() {
           title="Default Location"
           description="Himachal Pradesh"
         />
+        {showDrivers &&
+          MOCK_DRIVERS.map((driver) => (
+            <Marker
+              key={driver.id}
+              coordinate={{
+                latitude: driver.latitude,
+                longitude: driver.longitude,
+              }}
+              title={`Driver ${driver.id}`}
+              pinColor="blue"
+            />
+          ))}
       </MapView>
+
+      <View style={styles.mapControls}>
+        <TouchableOpacity
+          style={styles.controlButton}
+          onPress={handleMyLocation}
+        >
+          <Text style={styles.controlButtonText}>📍 My Location</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.controlButton}
+          onPress={handleShowDrivers}
+        >
+          <Text style={styles.controlButtonText}>🚕 Drivers</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.controlButton} onPress={handleFullMap}>
+          <Text style={styles.controlButtonText}>🗺️ Full Map</Text>
+        </TouchableOpacity>
+      </View>
 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -160,6 +256,31 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   wrapper: { flex: 1 },
   container: { flex: 1 },
+  mapControls: {
+    position: "absolute",
+    top: 60,
+    right: 20,
+    zIndex: 10,
+    gap: 12,
+  },
+  controlButton: {
+    backgroundColor: "#FFFFFF",
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 5,
+    elevation: 4,
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  controlButtonText: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#333",
+  },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: "flex-end",
