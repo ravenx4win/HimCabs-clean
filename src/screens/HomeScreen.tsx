@@ -54,9 +54,9 @@ export default function HomeScreen() {
     <View style={styles.wrapper}>
       <MapView
         style={StyleSheet.absoluteFillObject}
-        mapType="none" // ✅ IMPORTANT for OpenStreetMap
+        mapType="standard" // ✅ FIXED (was "none")
         initialRegion={{
-          latitude: 32.2190,
+          latitude: 32.219,
           longitude: 76.3234,
           latitudeDelta: 0.05,
           longitudeDelta: 0.05,
@@ -65,13 +65,12 @@ export default function HomeScreen() {
         followsUserLocation={true}
       >
         <UrlTile
-          urlTemplate="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          urlTemplate="https://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png" // ✅ more reliable server
           maximumZ={19}
-          flipY={false}
-          zIndex={-1} // ✅ ensures tiles stay below markers/UI
+          zIndex={-1}
         />
         <Marker
-          coordinate={{ latitude: 32.2190, longitude: 76.3234 }}
+          coordinate={{ latitude: 32.219, longitude: 76.3234 }}
           title="Default Location"
           description="Himachal Pradesh"
         />
