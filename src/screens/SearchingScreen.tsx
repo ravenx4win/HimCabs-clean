@@ -11,14 +11,41 @@ type SearchingNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "Searching"
 >;
+interface IBooking {
+  pickupLocation?: string;
+  dropLocation?: string;
+  vehicleType?: string;
+}
 
-export default function SearchingScreen() {
+function SearchingScreen() {
   const navigation = useNavigation<SearchingNavigationProp>();
   const route = useRoute<SearchingRouteProp>();
 
   const { booking } = route.params || {};
-  const { pickupLocation, dropLocation, vehicleType } = booking || {};
+  const bookingData: IBooking = booking || {};
+  const { pickupLocation, dropLocation, vehicleType } = bookingData || {};
 
+  const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
+  },
+  bold: { fontWeight: "700", color: "#000" },
+});
   useEffect(() => {
     if (!booking) return;
 
@@ -51,24 +78,4 @@ export default function SearchingScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#FFFFFF",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginTop: 20,
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#666",
-    textAlign: "center",
-  },
-  bold: { fontWeight: "700", color: "#000" },
-});
+export default React.memo(SearchingScreen);

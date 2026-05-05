@@ -33,6 +33,7 @@ export default function HomeScreen() {
     longitude: number;
   } | null>(null);
   const [showDrivers, setShowDrivers] = useState(false);
+  const [isFullMap, setIsFullMap] = useState(false);
 
   // ✅ Request location permission (important for user location)
   useEffect(() => {
@@ -86,17 +87,32 @@ export default function HomeScreen() {
   };
 
   const handleFullMap = () => {
-    setShowDrivers(false);
-    if (mapRef.current) {
-      mapRef.current.animateToRegion(
-        {
-          latitude: 32.219,
-          longitude: 76.3234,
-          latitudeDelta: 0.2,
-          longitudeDelta: 0.2,
-        },
-        1000,
-      );
+    setIsFullMap(!isFullMap);
+    if (!isFullMap) {
+      setShowDrivers(false);
+      if (mapRef.current) {
+        mapRef.current.animateToRegion(
+          {
+            latitude: 32.219,
+            longitude: 76.3234,
+            latitudeDelta: 0.2,
+            longitudeDelta: 0.2,
+          },
+          1000,
+        );
+      }
+    } else {
+      if (mapRef.current) {
+        mapRef.current.animateToRegion(
+          {
+            latitude: 32.219,
+            longitude: 76.3234,
+            latitudeDelta: 0.05,
+            longitudeDelta: 0.05,
+          },
+          1000,
+        );
+      }
     }
   };
 
@@ -128,7 +144,11 @@ export default function HomeScreen() {
           longitudeDelta: 0.05,
         }}
         showsUserLocation={true}
-        followsUserLocation={true}
+        scrollEnabled={true}
+        zoomEnabled={true}
+        pitchEnabled={true}
+        rotateEnabled={true}
+        userInterfaceStyle="light"
       >
         <UrlTile
           urlTemplate="https://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png" // ✅ more reliable server
@@ -154,7 +174,7 @@ export default function HomeScreen() {
           ))}
       </MapView>
 
-      <View style={styles.mapControls}>
+      <View style={styles.mapControls} pointerEvents="box-none">
         <TouchableOpacity
           style={styles.controlButton}
           onPress={handleMyLocation}
@@ -168,15 +188,18 @@ export default function HomeScreen() {
           <Text style={styles.controlButtonText}>🚕 Drivers</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.controlButton} onPress={handleFullMap}>
-          <Text style={styles.controlButtonText}>🗺️ Full Map</Text>
+          <Text style={styles.controlButtonText}>
+            {isFullMap ? "Hide Map" : "Full Map"}
+          </Text>
         </TouchableOpacity>
       </View>
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.container}
-        pointerEvents="box-none"
-      >
+      {!isFullMap && (
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.container}
+          pointerEvents="box-none"
+        >
         <ScrollView
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="handled"
@@ -249,6 +272,7 @@ export default function HomeScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+      )}
     </View>
   );
 }
@@ -259,9 +283,11 @@ const styles = StyleSheet.create({
   mapControls: {
     position: "absolute",
     top: 60,
-    right: 20,
+    left: 10,
+    right: 10,
     zIndex: 10,
-    gap: 12,
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   controlButton: {
     backgroundColor: "#FFFFFF",
@@ -274,7 +300,6 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 4,
     alignItems: "center",
-    marginBottom: 10,
   },
   controlButtonText: {
     fontSize: 13,
