@@ -64,6 +64,31 @@ export default function HomeScreen() {
     { id: "12", latitude: 32.2405, longitude: 76.3355 },
   ];
 
+  // ONLY NEW CHANGE: added this state BELOW your MOCK_DRIVERS
+
+  const [drivers, setDrivers] = useState(MOCK_DRIVERS);
+
+  // 🚀 NEW: simulate driver movement
+  useEffect(() => {
+    if (!showDrivers) return;
+
+    const interval = setInterval(() => {
+      setDrivers((prevDrivers) =>
+        prevDrivers.map((driver) => {
+          const randomOffset = () => (Math.random() - 0.5) * 0.0007;
+
+          return {
+            ...driver,
+            latitude: driver.latitude + randomOffset(),
+            longitude: driver.longitude + randomOffset(),
+          };
+        })
+      );
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [showDrivers]);
+
   const handleMyLocation = () => {
     if (userLocation && mapRef.current) {
       mapRef.current.animateToRegion(
@@ -170,7 +195,7 @@ export default function HomeScreen() {
           description="Himachal Pradesh"
         />
         {showDrivers &&
-          MOCK_DRIVERS.map((driver) => (
+          drivers.map((driver) => (
             <Marker
               key={driver.id}
               coordinate={{
