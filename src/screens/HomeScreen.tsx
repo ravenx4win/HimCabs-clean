@@ -50,9 +50,18 @@ export default function HomeScreen() {
   }, []);
 
   const MOCK_DRIVERS = [
-    { id: "1", latitude: 32.221, longitude: 76.325 },
-    { id: "2", latitude: 32.215, longitude: 76.32 },
-    { id: "3", latitude: 32.225, longitude: 76.328 },
+    { id: "1", latitude: 32.2396, longitude: 76.3239 },
+    { id: "2", latitude: 32.2432, longitude: 76.3343 },
+    { id: "3", latitude: 32.2490, longitude: 76.3600 },
+    { id: "4", latitude: 32.2167, longitude: 76.3200 },
+    { id: "5", latitude: 32.2100, longitude: 76.3150 },
+    { id: "6", latitude: 32.2380, longitude: 76.3210 },
+    { id: "7", latitude: 32.0998, longitude: 76.2691 },
+    { id: "8", latitude: 32.1050, longitude: 76.2750 },
+    { id: "9", latitude: 32.2330, longitude: 76.3300 },
+    { id: "10", latitude: 32.2270, longitude: 76.3250 },
+    { id: "11", latitude: 32.2205, longitude: 76.3190 },
+    { id: "12", latitude: 32.2405, longitude: 76.3355 },
   ];
 
   const handleMyLocation = () => {
@@ -200,78 +209,78 @@ export default function HomeScreen() {
           style={styles.container}
           pointerEvents="box-none"
         >
-        <ScrollView
-          contentContainerStyle={styles.scrollContainer}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View style={styles.card}>
-            <Text style={styles.logo}>🚕 HimCabs</Text>
-            <Text style={styles.tagline}>Book bikes & rides easily</Text>
+          <ScrollView
+            contentContainerStyle={styles.scrollContainer}
+            keyboardShouldPersistTaps="handled"
+          >
+            <View style={styles.card}>
+              <Text style={styles.logo}>🚕 HimCabs</Text>
+              <Text style={styles.tagline}>Book bikes & rides easily</Text>
 
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Pickup Location</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="e.g. Dharamshala Bus Stand"
-                value={pickupLocation}
-                onChangeText={setPickupLocation}
-              />
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Pickup Location</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="e.g. Dharamshala Bus Stand"
+                  value={pickupLocation}
+                  onChangeText={setPickupLocation}
+                />
 
-              <Text style={styles.label}>Drop Location</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="e.g. McLeod Ganj Main Square"
-                value={dropLocation}
-                onChangeText={setDropLocation}
-              />
-            </View>
+                <Text style={styles.label}>Drop Location</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="e.g. McLeod Ganj Main Square"
+                  value={dropLocation}
+                  onChangeText={setDropLocation}
+                />
+              </View>
 
-            <Text style={styles.label}>Select Vehicle</Text>
-            <View style={styles.vehicleContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.vehicleButton,
-                  vehicleType === "Bike" && styles.vehicleButtonSelected,
-                ]}
-                onPress={() => setVehicleType("Bike")}
-              >
-                <Text
+              <Text style={styles.label}>Select Vehicle</Text>
+              <View style={styles.vehicleContainer}>
+                <TouchableOpacity
                   style={[
-                    styles.vehicleText,
-                    vehicleType === "Bike" && styles.vehicleTextSelected,
+                    styles.vehicleButton,
+                    vehicleType === "Bike" && styles.vehicleButtonSelected,
                   ]}
+                  onPress={() => setVehicleType("Bike")}
                 >
-                  🏍️ Bike
-                </Text>
-              </TouchableOpacity>
+                  <Text
+                    style={[
+                      styles.vehicleText,
+                      vehicleType === "Bike" && styles.vehicleTextSelected,
+                    ]}
+                  >
+                    🏍️ Bike
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.vehicleButton,
+                    vehicleType === "Auto" && styles.vehicleButtonSelected,
+                  ]}
+                  onPress={() => setVehicleType("Auto")}
+                >
+                  <Text
+                    style={[
+                      styles.vehicleText,
+                      vehicleType === "Auto" && styles.vehicleTextSelected,
+                    ]}
+                  >
+                    🛺 Auto
+                  </Text>
+                </TouchableOpacity>
+              </View>
 
               <TouchableOpacity
-                style={[
-                  styles.vehicleButton,
-                  vehicleType === "Auto" && styles.vehicleButtonSelected,
-                ]}
-                onPress={() => setVehicleType("Auto")}
+                style={styles.bookButton}
+                onPress={handleBookRide}
               >
-                <Text
-                  style={[
-                    styles.vehicleText,
-                    vehicleType === "Auto" && styles.vehicleTextSelected,
-                  ]}
-                >
-                  🛺 Auto
-                </Text>
+                <Text style={styles.bookButtonText}>Book a Ride</Text>
               </TouchableOpacity>
             </View>
-
-            <TouchableOpacity
-              style={styles.bookButton}
-              onPress={handleBookRide}
-            >
-              <Text style={styles.bookButtonText}>Book a Ride</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+          </ScrollView>
+        </KeyboardAvoidingView>
       )}
     </View>
   );
