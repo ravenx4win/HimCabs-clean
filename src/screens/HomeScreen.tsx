@@ -62,6 +62,24 @@ export default function HomeScreen() {
     { id: "10", latitude: 32.2270, longitude: 76.3250 },
     { id: "11", latitude: 32.2205, longitude: 76.3190 },
     { id: "12", latitude: 32.2405, longitude: 76.3355 },
+    { id: "13", latitude: 32.2426, longitude: 76.3207 }, // Dalai Lama Temple (Tsuglagkhang)
+    { id: "14", latitude: 32.2448, longitude: 76.3310 }, // Bhagsu Temple
+    { id: "15", latitude: 32.2465, longitude: 76.3365 }, // Bhagsu Waterfall (more precise)
+    { id: "16", latitude: 32.2422, longitude: 76.3276 }, // McLeod Ganj Main Square
+    { id: "17", latitude: 32.2335, longitude: 76.3290 }, // Naddi Sunset Point
+    { id: "18", latitude: 32.2370, longitude: 76.3215 }, // Dal Lake Dharamshala (refined)
+    { id: "19", latitude: 32.2190, longitude: 76.3234 }, // HPCA Cricket Stadium
+    { id: "20", latitude: 32.2253, longitude: 76.3180 }, // Dharamshala War Memorial
+    { id: "21", latitude: 32.2305, longitude: 76.3162 }, // Tea Gardens Dharamshala
+    { id: "22", latitude: 32.2640, longitude: 76.3750 }, // Triund Trek Base Area
+    { id: "23", latitude: 32.1006, longitude: 76.2697 }, // Kangra Fort (refined)
+    { id: "24", latitude: 32.1145, longitude: 76.2835 }, // Masroor Rock Cut Temple
+    { id: "25", latitude: 32.2282, longitude: 76.3195 }, // St. John in the Wilderness Church
+    { id: "26", latitude: 32.2355, longitude: 76.3228 }, // Dharamkot Meditation Area
+    { id: "27", latitude: 32.2388, longitude: 76.3272 }, // Tibetan Museum
+    { id: "28", latitude: 32.2105, longitude: 76.3155 }, // Dharamshala Market
+    { id: "29", latitude: 32.2468, longitude: 76.3322 }, // Shiva Cafe (popular spot)
+    { id: "30", latitude: 32.2535, longitude: 76.3605 }, // Triund Hill Top
   ];
 
   // ONLY NEW CHANGE: added this state BELOW your MOCK_DRIVERS
