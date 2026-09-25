@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "../screens/HomeScreen";
 import SearchingScreen from "../screens/SearchingScreen";
 import RideTrackingScreen from "../screens/RideTrackingScreen";
+import FullMapScreen from "../screens/FullMapScreen";
 
 /**
  * Define the navigation routes and their params.
@@ -12,6 +13,7 @@ import RideTrackingScreen from "../screens/RideTrackingScreen";
  */
 export type RootStackParamList = {
   Home: undefined;
+  FullMap: undefined;
   Searching: {
     booking: {
       pickupLocation: string;
@@ -42,6 +44,7 @@ export default function AppNavigator() {
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="FullMap" component={FullMapScreen} />
         <Stack.Screen name="Searching" component={SearchingScreen} />
         <Stack.Screen name="RideTracking" component={RideTrackingScreen} />
       </Stack.Navigator>

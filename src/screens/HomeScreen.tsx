@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  TextInput,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
@@ -15,6 +14,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import * as Location from "expo-location";
 
 import { RootStackParamList } from "../navigation/AppNavigator";
+import LocationAutocomplete, { LocationCoords } from "../components/LocationAutocomplete";
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -33,21 +33,14 @@ export default function HomeScreen() {
     longitude: number;
   } | null>(null);
   const [showDrivers, setShowDrivers] = useState(false);
-  const [isFullMap, setIsFullMap] = useState(false);
 
-  // ✅ Request location permission (important for user location)
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") return;
+  // Coordinates selected from the autocomplete — available for future
+  // route-calculation features without a second geocode round-trip.
+  const [pickupCoords, setPickupCoords] = useState<LocationCoords | null>(null);
+  const [dropCoords, setDropCoords] = useState<LocationCoords | null>(null);
 
-      let location = await Location.getCurrentPositionAsync({});
-      setUserLocation({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      });
-    })();
-  }, []);
+  // Location is only requested when the user explicitly taps "Use My Current Location"
+  // inside the FullMapScreen. No automatic permission request on HomeScreen load.
 
   const MOCK_DRIVERS = [
     { id: "1", latitude: 32.2396, longitude: 76.3239 },
@@ -139,33 +132,7 @@ export default function HomeScreen() {
   };
 
   const handleFullMap = () => {
-    setIsFullMap(!isFullMap);
-    if (!isFullMap) {
-      setShowDrivers(false);
-      if (mapRef.current) {
-        mapRef.current.animateToRegion(
-          {
-            latitude: 32.219,
-            longitude: 76.3234,
-            latitudeDelta: 0.2,
-            longitudeDelta: 0.2,
-          },
-          1000,
-        );
-      }
-    } else {
-      if (mapRef.current) {
-        mapRef.current.animateToRegion(
-          {
-            latitude: 32.219,
-            longitude: 76.3234,
-            latitudeDelta: 0.05,
-            longitudeDelta: 0.05,
-          },
-          1000,
-        );
-      }
-    }
+    navigation.navigate("FullMap");
   };
 
   const handleBookRide = () => {
@@ -187,7 +154,7 @@ export default function HomeScreen() {
     <View style={styles.wrapper}>
       <MapView
         ref={mapRef}
-        style={StyleSheet.absoluteFillObject}
+        style={StyleSheet.absoluteFill}
         mapType="standard" // ✅ FIXED (was "none")
         initialRegion={{  // This coordinates will start from dshala everytime.
           latitude: 32.219,
@@ -240,13 +207,11 @@ export default function HomeScreen() {
           <Text style={styles.controlButtonText}>🚕 Drivers</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.controlButton} onPress={handleFullMap}>
-          <Text style={styles.controlButtonText}>
-            {isFullMap ? "Hide Map" : "Full Map"}
-          </Text>
+          <Text style={styles.controlButtonText}>Full Map</Text>
         </TouchableOpacity>
       </View>
 
-      {!isFullMap && (
+      <View style={styles.bookingPanel} pointerEvents="box-none">
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={styles.container}
@@ -261,20 +226,25 @@ export default function HomeScreen() {
               <Text style={styles.tagline}>Book bikes & rides easily</Text>
 
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>Pickup Location</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="e.g. Dharamshala Bus Stand"
+                <LocationAutocomplete
+                  label="Pickup Location"
+                  placeholder="Search pickup — e.g. Dharamshala Bus Stand"
                   value={pickupLocation}
-                  onChangeText={setPickupLocation}
+                  onSelectSuggestion={(name, coords) => {
+                    setPickupLocation(name);
+                    if (coords) setPickupCoords(coords);
+                  }}
+                  dropdownZIndex={30}
                 />
-
-                <Text style={styles.label}>Drop Location</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="e.g. McLeod Ganj Main Square"
+                <LocationAutocomplete
+                  label="Drop Location"
+                  placeholder="Search destination — e.g. McLeod Ganj"
                   value={dropLocation}
-                  onChangeText={setDropLocation}
+                  onSelectSuggestion={(name, coords) => {
+                    setDropLocation(name);
+                    if (coords) setDropCoords(coords);
+                  }}
+                  dropdownZIndex={20}
                 />
               </View>
 
@@ -324,7 +294,7 @@ export default function HomeScreen() {
             </View>
           </ScrollView>
         </KeyboardAvoidingView>
-      )}
+      </View>
     </View>
   );
 }
@@ -332,6 +302,14 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   wrapper: { flex: 1 },
   container: { flex: 1 },
+  bookingPanel: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    top: 0,
+    justifyContent: "flex-end",
+  },
   mapControls: {
     position: "absolute",
     top: 60,
@@ -373,6 +351,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 10,
     elevation: 5,
+    // Required so the autocomplete dropdown (position:absolute) is not
+    // clipped by the card's borderRadius
+    overflow: "visible",
   },
   logo: {
     fontSize: 32,
@@ -386,21 +367,18 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 30,
   },
-  inputContainer: { marginBottom: 20 },
+  inputContainer: {
+    // zIndex lets the autocomplete dropdown float above the vehicle
+    // selector and book button that come after it in the flex layout.
+    zIndex: 20,
+    marginBottom: 20,
+  },
+  // Used by the "Select Vehicle" label below the autocomplete inputs
   label: {
     fontSize: 14,
     fontWeight: "600",
     marginBottom: 8,
     color: "#333",
-  },
-  input: {
-    backgroundColor: "#F0F2F5",
-    borderRadius: 10,
-    padding: 15,
-    fontSize: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: "#E4E6EB",
   },
   vehicleContainer: {
     flexDirection: "row",
