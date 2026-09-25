@@ -82,7 +82,7 @@ export default function HomeScreen() {
     { id: "30", latitude: 32.2535, longitude: 76.3605 }, // Triund Hill Top
   ];
 
-  // ONLY NEW CHANGE: added this state BELOW your MOCK_DRIVERS
+  // Hardcoded drivers for a while.
 
   const [drivers, setDrivers] = useState(MOCK_DRIVERS);
 
@@ -189,7 +189,7 @@ export default function HomeScreen() {
         ref={mapRef}
         style={StyleSheet.absoluteFillObject}
         mapType="standard" // ✅ FIXED (was "none")
-        initialRegion={{
+        initialRegion={{  // This coordinates will start from dshala everytime.
           latitude: 32.219,
           longitude: 76.3234,
           latitudeDelta: 0.05,
